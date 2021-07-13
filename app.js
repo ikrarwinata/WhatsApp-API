@@ -32,7 +32,7 @@ client.on('disconnected', (reason) => {
 });
 
 io.on("connection", function(socket) {
-    socket.emit("message", " Cconnection started...");
+    socket.emit("message", " Connection started...");
     if (ready) {
         socket.emit("ready", " Whatsapp Status Ready!");
     }
