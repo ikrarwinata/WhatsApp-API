@@ -86,6 +86,11 @@
                 WAReady = true;
             })
 
+            socket.on('disconnected', function(src) {
+                $('#qrcode').show();
+                WAReady = false;
+            })
+
             getNotif();
         });
 
