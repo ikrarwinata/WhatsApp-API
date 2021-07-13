@@ -62,6 +62,7 @@ io.on("connection", function(socket) {
 
     client.on('disconnected', (reason) => {
         socket.emit("message", " Client was logged out");
+        socket.emit("disconnected", " Client was logged out");
         console.log('Client was logged out', reason);
     });
 })
