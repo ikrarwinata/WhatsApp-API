@@ -60,7 +60,8 @@
             sended = [],
             tgl_text = [],
             complete,
-            WAReady;
+            WAReady,
+            allDone;
 
         $(document).ready(function() {
             var socket = io.connect('http://localhost:8000', {
@@ -133,7 +134,8 @@
                         tgl.push(this.tgl);
                         tgl_text.push(strtotime(this.tgl));
                         sended.push(false);
-                    })
+                    });
+                    allDone = false;
                 },
                 error: function(xhr, status) {
                     alert("Gagal Mengambil Data Notifikasi !");
@@ -143,21 +145,25 @@
 
         var intVal = setInterval(function() {
             complete = true;
-            $(notif).each(function(e) {
-                if (sended[e] == false) {
-                    if ((tgl[e] - toleransiWaktu) <= (Math.floor(Date.now() / 1000))) {
-                        if (WAReady) {
-                            sendMsg(this, ids[e], tgl_text[e]);
-                            sended[e] = true;
+            if (!allDone) {
+                $(notif).each(function(e) {
+                    if (sended[e] == false) {
+                        if ((tgl[e] - toleransiWaktu) <= (Math.floor(Date.now() / 1000))) {
+                            if (WAReady) {
+                                sendMsg(this, ids[e], tgl_text[e]);
+                                sended[e] = true;
+                            } else {
+                                $('.logs').prepend("<li>Pengiriman pesan tertunda, WA belum di otentikasi</li>");
+                            }
                         } else {
-                            $('.logs').prepend("<li>Pengiriman pesan tertunda, WA belum di otentikasi</li>");
+                            complete = false;
                         }
-                    } else {
-                        complete = false;
                     }
-                }
-            })
-            if (complete) clearInterval(intVal);
+                })
+                if (complete) {
+                    allDone = true;
+                };
+            }
         }, 20000)
 
         function sendMsg(data, ids, tgl_text) {
