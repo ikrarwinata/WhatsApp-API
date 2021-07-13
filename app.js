@@ -27,10 +27,6 @@ app.get("/", (req, res) => {
     res.sendFile("index.html", { root: __dirname });
 })
 
-client.on('disconnected', (reason) => {
-    console.log('Client was logged out', reason);
-});
-
 io.on("connection", function(socket) {
     socket.emit("message", " Connection started...");
     if (ready) {
@@ -62,6 +58,11 @@ io.on("connection", function(socket) {
                 console.error(err);
             }
         });
+    });
+
+    client.on('disconnected', (reason) => {
+        socket.emit("message", " Client was logged out");
+        console.log('Client was logged out', reason);
     });
 })
 
