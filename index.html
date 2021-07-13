@@ -59,7 +59,8 @@
             tgl = [],
             sended = [],
             tgl_text = [],
-            complete;
+            complete,
+            WAReady;
 
         $(document).ready(function() {
             var socket = io.connect('http://localhost:8000', {
@@ -71,15 +72,18 @@
             })
 
             socket.on('qr', function(src) {
+                WAReady = false;
                 $('#qrcode').attr("src", src).show();
             })
 
             socket.on('ready', function(src) {
                 $('#qrcode').hide();
+                WAReady = true;
             })
 
             socket.on('authenticated', function(src) {
                 $('#qrcode').hide();
+                WAReady = true;
             })
 
             getNotif();
@@ -137,8 +141,12 @@
             $(notif).each(function(e) {
                 if (sended[e] == false) {
                     if ((tgl[e] - toleransiWaktu) <= (Math.floor(Date.now() / 1000))) {
-                        sendMsg(this, ids[e], tgl_text[e]);
-                        sended[e] = true;
+                        if (WAReady) {
+                            sendMsg(this, ids[e], tgl_text[e]);
+                            sended[e] = true;
+                        } else {
+                            $('.logs').prepend("<li>Pengiriman pesan tertunda, WA belum di otentikasi</li>");
+                        }
                     } else {
                         complete = false;
                     }
